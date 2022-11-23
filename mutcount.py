@@ -8,6 +8,7 @@ def reverse_complement(dna):
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N':'N'}
     return ''.join([complement[base] for base in dna[::-1]])
 
+print("Usage: python mutcount.py <R1.fastq.gz> <R2.fastq.gz> <output_keyword>")
 
 # Read CMD
 fname1 = sys.argv[1]
