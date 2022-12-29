@@ -7,7 +7,7 @@
 `python mutcount.py <name.R1.fastq.gz> <name.R2.fastq.gz> <output_name> <FMT>`
 
 ## example
-`python mutcount.py example.R1.fastq.gz example.R2.fastq.gz test AE`
+`python mutcount.py example.R1.fastq.gz example.R2.fastq.gz test WA`
 
 ## FMT
 - AE
