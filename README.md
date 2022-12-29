@@ -9,7 +9,7 @@
 ## example
 `python mutcount.py example.R1.fastq.gz example.R2.fastq.gz test WA`
 
-## FMT (Format)
+## FMT (Library Format)
 - AE: library containing all A and E substitutions at each phosphosite, in all possible combinations, in addition to the completely the wild type sequence
 - WA: library containing the wild type sequence (W) or A substitutions at each phosphosite, in all possible combinations, in addition to the completely wild type sequence
 - WE: library containing the wild type sequence (W) or E substitutions at each phosphosite, in all possible combinations, in addition to the completely wild type sequence
