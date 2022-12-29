@@ -3,17 +3,18 @@ import matplotlib; matplotlib.use('agg')
 import matplotlib.pyplot as plt; 
 from pathlib import Path
 
+# Dec, 2020: supports 2 additional formats: WE and WA, plus original AE
 
 def reverse_complement(dna):
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N':'N'}
     return ''.join([complement[base] for base in dna[::-1]])
 
-print("Usage: python mutcount.py <R1.fastq.gz> <R2.fastq.gz> <output_keyword>")
 
 # Read CMD
 fname1 = sys.argv[1]
 fname2 = sys.argv[2]
 name = sys.argv[3]
+FMT=sys.argv[4]
 print("CMD: ", sys.argv)
 
 # Mkdir
@@ -41,16 +42,48 @@ for i in range(0, 9):
     C["C{0}".format(i)] = Commons[i]
 print(C)
 
-S0 = ["GCTCCT", "GAGGAA"]
-S1 = ["GCTCCG", "GAGGAA"]
-S2 = ["GCGCCA", "GAAGAG"]
-S3 = ["GCACCA", "GAGGAG"]
-S4 = ["GCACCC", "GAGGAA"]
-S5 = ["GCTCCT", "GAAGAG"]
-S6 = ["GCCCCC", "GAGGAA"]
-S7 = ["GCTCCT", "GAGGAG"]
-Sites = [S0, S1, S2, S3, S4, S5, S6, S7]
+mutSeqDict = {}
+if FMT == "AE":
+    # MC1, MC2 (Nov, 2019)
+    S0 = ["GCTCCT", "GAGGAA"]
+    S1 = ["GCTCCG", "GAGGAA"]
+    S2 = ["GCGCCA", "GAAGAG"]
+    S3 = ["GCACCA", "GAGGAG"]
+    S4 = ["GCACCC", "GAGGAA"]
+    S5 = ["GCTCCT", "GAAGAG"]
+    S6 = ["GCCCCC", "GAGGAA"]
+    S7 = ["GCTCCT", "GAGGAG"]
+    dictionary = dict(zip([0,1], ["A", "E"]))
+    mutSeqDict["WWWWWWWW"] = "CTCATGGTTCGGACTTACTTAAAACACCCAAGATGAGGCATTCCGATGGCTTAGAGAAAACCCCATCGCGGTTGATAAGCACACCTAAGGACGGTAACTCGATTTTGAGGAAATGGCAGACTCCTTCACACCTTTTTGAAGATTTGTACTGTTCTCCGCTATTTAGAGCTATAGAGACTCCAATCAGGTATATCACGACGCCGGGGGGCACTTTGGAAACCCAAATTTCACCAAGAAAGTCCTCTGCACCC"
+    outname="MutSeqs257.AE.fasta"
+elif FMT == "WA":
+    # WT_A (Nov, 2020)
+    S0 = ["ACACCC", "GCTCCT"]
+    S1 = ["ACCCCA", "GCTCCG"]
+    S2 = ["ACACCT", "GCGCCA"]
+    S3 = ["ACTCCT", "GCACCA"]
+    S4 = ["TCTCCG", "GCACCC"]
+    S5 = ["ACTCCA", "GCTCCT"]
+    S6 = ["ACGCCG", "GCCCCC"]
+    S7 = ["TCACCA", "GCTCCT"]
+    dictionary = dict(zip([0,1], ["W", "A"]))
+    mutSeqDict["EEEEEEEE"] = "CTCATGGTTCGGACTTACTTAAAGAGGAAAAGATGAGGCATTCCGATGGCTTAGAGAAAGAGGAATCGCGGTTGATAAGCGAAGAGAAGGACGGTAACTCGATTTTGAGGAAATGGCAGGAGGAGTCACACCTTTTTGAAGATTTGTACTGTGAGGAACTATTTAGAGCTATAGAGGAAGAGATCAGGTATATCACGGAGGAAGGGGGCACTTTGGAAACCCAAATTGAGGAGAGAAAGTCCTCTGCACCC"
+    outname="MutSeqs257.WA.fasta"
+elif FMT == "WE":
+    # WT_E (Nov, 2020)
+    S0=['ACACCC', 'GAGGAA']
+    S1=['ACCCCA', 'GAGGAA']
+    S2=['ACACCT', 'GAAGAG']
+    S3=['ACTCCT', 'GAGGAG']
+    S4=['TCTCCG', 'GAGGAA']
+    S5=['ACTCCA', 'GAAGAG']
+    S6=['ACGCCG', 'GAGGAA']
+    S7=['TCACCA', 'GAGGAG']
+    dictionary = dict(zip([0,1], ["W", "E"]))
+    mutSeqDict["AAAAAAAA"] = "CTCATGGTTCGGACTTACTTAAAGCTCCTAAGATGAGGCATTCCGATGGCTTAGAGAAAGCTCCGTCGCGGTTGATAAGCGCGCCAAAGGACGGTAACTCGATTTTGAGGAAATGGCAGGCACCATCACACCTTTTTGAAGATTTGTACTGTGCACCCCTATTTAGAGCTATAGAGGCTCCTATCAGGTATATCACGGCCCCCGGGGGCACTTTGGAAACCCAAATTGCTCCTAGAAAGTCCTCTGCACCC"
+    outname="MutSeqs257.WE.fasta"
 
+Sites = [S0, S1, S2, S3, S4, S5, S6, S7]
 S = {}
 for i in range(0,8):
     S["S{0}".format(i)] = Sites[i]
@@ -63,10 +96,8 @@ print(combinations[0],
 combinations[1],
 combinations[255])
 
-dictionary = dict(zip([0,1], ["A", "E"]))
 dictionary
 
-mutSeqDict = {}
 for i in range(0, 256):
     #print("\n", i)
     
@@ -99,13 +130,12 @@ for i in range(0, 256):
     
     mutSeqDict[letter] = mutSeq
     
-mutSeqDict["WWWWWWWW"] = "CTCATGGTTCGGACTTACTTAAAACACCCAAGATGAGGCATTCCGATGGCTTAGAGAAAACCCCATCGCGGTTGATAAGCACACCTAAGGACGGTAACTCGATTTTGAGGAAATGGCAGACTCCTTCACACCTTTTTGAAGATTTGTACTGTTCTCCGCTATTTAGAGCTATAGAGACTCCAATCAGGTATATCACGACGCCGGGGGGCACTTTGGAAACCCAAATTTCACCAAGAAAGTCCTCTGCACCC"
 
 print(len(mutSeqDict), " Mut seqs")
 
 
 # Save Mut.Fasta
-file = open("MutSeqs257.fasta", 'w')
+file = open(outname, 'w')
 for key in mutSeqDict:
     seq = mutSeqDict[key]
     file.writelines(">{0}\n{1}\n".format(key, seq))    
